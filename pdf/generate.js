@@ -240,9 +240,9 @@ doc.font('Helvetica-Bold').fontSize(18).fillColor(C.black).text('ROI : 3.6x', 75
 // ─────────────────────────────────────────────────────────
 bg(C.black);
 heading('PRÊT POUR', 50, 250, 64, C.white);
-heading('L\'AUTONOMIE ?', 50, 310, 64, C.white);
+heading('L\'AUTONOMIE ?', 50, 310, 54, C.white);
 
-body('L\'infrastructure de demain ne dort pas. La vôtre non plus.', 50, 420, 14, C.white);
+body('L\'infrastructure de demain ne dort pas. La vôtre non plus.', 50, 440, 14, C.white);
 
 card(50, 480, W - 100, 80, C.white, 1, 40);
 doc.font('Helvetica-Bold').fontSize(18).fillColor(C.black).text('RÉSERVER MON AUDIT', 50, 510, { align: 'center', width: W - 100 });
