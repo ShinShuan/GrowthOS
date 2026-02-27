@@ -6,6 +6,43 @@ import { sendPdfEmail } from '../services/email';
 const router = Router();
 
 
+// Diagnostic endpoint
+router.get('/debug-config', async (_req: Request, res: Response) => {
+    try {
+        const apiKey = process.env.AIRTABLE_API_KEY;
+        const baseId = process.env.AIRTABLE_BASE_ID;
+        const tableName = process.env.AIRTABLE_TABLE_NAME || 'Nouvelle Table (Default)';
+
+        let connectionStatus = "Not Tested";
+        let airtableError = null;
+
+        try {
+            const result = await testAirtableConnection();
+            connectionStatus = result.success ? "SUCCESS" : "FAILED";
+            if (!result.success) airtableError = result.message;
+        } catch (e: any) {
+            connectionStatus = "CRASHED";
+            airtableError = e.message;
+        }
+
+        return res.status(200).json({
+            success: true,
+            config: {
+                AIRTABLE_TABLE_NAME: tableName,
+                AIRTABLE_BASE_ID: baseId ? `${baseId.substring(0, 3)}...${baseId.substring(baseId.length - 3)}` : 'MISSING',
+                AIRTABLE_API_KEY_FORMAT: apiKey ? (apiKey.startsWith('pat.') ? 'VALID (pat.)' : 'INVALID (No pat.)') : 'MISSING',
+                ENV_PORT: process.env.PORT,
+            },
+            connectivity: {
+                status: connectionStatus,
+                error: airtableError
+            }
+        });
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // Test Airtable connectivity
 router.get('/test', async (_req: Request, res: Response) => {
     try {
