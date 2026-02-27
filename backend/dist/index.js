@@ -35,3 +35,4 @@ if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     });
 }
 exports.default = app;
+module.exports = app;
