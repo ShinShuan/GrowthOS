@@ -29,9 +29,10 @@ router.get('/debug-config', async (_req: Request, res: Response) => {
             success: true,
             config: {
                 AIRTABLE_TABLE_NAME: tableName,
-                AIRTABLE_BASE_ID: baseId ? `${baseId.substring(0, 3)}...${baseId.substring(baseId.length - 3)}` : 'MISSING',
+                AIRTABLE_BASE_ID_MASK: baseId ? `${baseId.substring(0, 3)}...${baseId.substring(baseId.length - 3)}` : 'MISSING',
+                AIRTABLE_API_KEY_START: apiKey ? `${apiKey.substring(0, 4)}...` : 'MISSING',
                 AIRTABLE_API_KEY_FORMAT: apiKey ? (apiKey.startsWith('pat.') ? 'VALID (pat.)' : 'INVALID (No pat.)') : 'MISSING',
-                ENV_PORT: process.env.PORT,
+                TIPS: "Verified from code: If START is NOT 'pat.', you are updating the wrong Vercel project."
             },
             connectivity: {
                 status: connectionStatus,
