@@ -3,11 +3,16 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-    process.env.AIRTABLE_BASE_ID || ''
-);
-
 const TABLE = process.env.AIRTABLE_TABLE_NAME || 'Leads';
+
+function getBase() {
+    const apiKey = process.env.AIRTABLE_API_KEY;
+    const baseId = process.env.AIRTABLE_BASE_ID;
+    if (!apiKey || !baseId) {
+        throw new Error('Missing Airtable env vars: AIRTABLE_API_KEY and AIRTABLE_BASE_ID are required.');
+    }
+    return new Airtable({ apiKey }).base(baseId);
+}
 
 export interface LeadData {
     nom: string;
@@ -17,6 +22,7 @@ export interface LeadData {
 }
 
 export async function createLead(data: LeadData) {
+    const base = getBase();
     const record = await base(TABLE).create([
         {
             fields: {
@@ -34,6 +40,7 @@ export async function createLead(data: LeadData) {
 }
 
 export async function updateLeadStatus(recordId: string, statut: string) {
+    const base = getBase();
     const record = await base(TABLE).update(recordId, {
         Statut: statut,
     });
