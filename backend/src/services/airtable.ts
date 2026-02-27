@@ -40,35 +40,20 @@ export async function createLead(data: LeadData) {
             setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout 8s)')), 8000)
         );
 
-        // Attempt 1: Full fields
-        const createWithAllFields = () => base(TABLE).create([
+        // Create record with exact fields from the screenshot
+        const createRecord = () => base(TABLE).create([
             {
                 fields: {
-                    "Name": data.nom || "Client",
-                    "Description": `Email: ${data.email}\nTéléphone: ${data.telephone}\nAgence: ${data.agence}\nDate: ${new Date().toLocaleString()}`,
-                    "Status": "Draft"
+                    "Nom": data.nom || "Client",
+                    "Email": data.email || "",
+                    "Téléphone": data.telephone || "",
+                    "Agence": data.agence || ""
                 },
             },
         ]);
 
-        try {
-            const records = await Promise.race([createWithAllFields(), timeoutPromise]) as any;
-            return records[0];
-        } catch (innerError: any) {
-            console.warn('[Airtable Attempt 1 Failed] Trying fallback with fewer fields...', innerError.message);
-
-            // Attempt 2: Minimal fields (just Name) - some users might not have Description or Status columns
-            const createMinimal = () => base(TABLE).create([
-                {
-                    fields: {
-                        "Name": `${data.nom} (${data.email})` || "Client",
-                    },
-                },
-            ]);
-
-            const records = await Promise.race([createMinimal(), timeoutPromise]) as any;
-            return records[0];
-        }
+        const records = await Promise.race([createRecord(), timeoutPromise]) as any;
+        return records[0];
     } catch (error: any) {
         console.error('[Airtable Error Details]', {
             message: error.message,
