@@ -21,9 +21,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/leads', leadsRouter);
 app.use('/api/pdf', pdfRouter);
 
-// Health check
+// Health check & Root
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+app.get('/', (_req, res) => {
+    res.send('GrowthOS Backend is running. Access API at /api/...');
 });
 
 // Export the app for Vercel Serverless
