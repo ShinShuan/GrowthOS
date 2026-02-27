@@ -26,7 +26,12 @@ export async function createLead(data: LeadData) {
     console.log(`[Airtable] Attempting to create lead in table: ${TABLE}`);
 
     try {
-        const record = await base(TABLE).create([
+        // Add a timeout to Airtable creation to avoid hanging the function
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout)')), 6000)
+        );
+
+        const recordPromise = base(TABLE).create([
             {
                 fields: {
                     "Name": data.nom,
@@ -35,6 +40,8 @@ export async function createLead(data: LeadData) {
                 },
             },
         ]);
+
+        const record = await Promise.race([recordPromise, timeoutPromise]) as Airtable.Records<Airtable.FieldSet>;
         return record[0];
     } catch (error: any) {
         console.error('[Airtable Error]', error);

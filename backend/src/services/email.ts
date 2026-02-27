@@ -8,30 +8,33 @@ dotenv.config();
 const PDF_PATH = path.join(__dirname, '../../../pdf/output/Guide_10_RDV_automatiques.pdf');
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.zoho.com',
-    port: parseInt(process.env.SMTP_PORT || '465'),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
+  host: process.env.SMTP_HOST || 'smtp.zoho.com',
+  port: parseInt(process.env.SMTP_PORT || '465'),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  connectionTimeout: 5000, // 5s timeout
+  greetingTimeout: 5000,
+  socketTimeout: 5000,
 });
 
 export async function sendPdfEmail({ nom, email }: { nom: string; email: string }) {
-    const prenom = nom.split(' ')[0];
+  const prenom = nom.split(' ')[0];
 
-    // Check if PDF exists
-    const hasPdf = fs.existsSync(PDF_PATH);
+  // Check if PDF exists
+  const hasPdf = fs.existsSync(PDF_PATH);
 
-    const attachments = hasPdf
-        ? [{ filename: 'Guide_10_RDV_automatiques.pdf', path: PDF_PATH }]
-        : [];
+  const attachments = hasPdf
+    ? [{ filename: 'Guide_10_RDV_automatiques.pdf', path: PDF_PATH }]
+    : [];
 
-    await transporter.sendMail({
-        from: process.env.EMAIL_FROM || 'Marc <contact@growthos.fr>',
-        to: email,
-        subject: `✅ Votre guide est prêt, ${prenom}`,
-        html: `
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'Marc <contact@growthos.fr>',
+    to: email,
+    subject: `✅ Votre guide est prêt, ${prenom}`,
+    html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -87,6 +90,6 @@ export async function sendPdfEmail({ nom, email }: { nom: string; email: string 
       </body>
       </html>
     `,
-        attachments,
-    });
+    attachments,
+  });
 }
