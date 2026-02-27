@@ -9,13 +9,18 @@ function getBase() {
     const apiKey = process.env.AIRTABLE_API_KEY;
     const baseId = process.env.AIRTABLE_BASE_ID;
 
-    console.log('[Airtable Config] API Key exists:', !!apiKey);
-    console.log('[Airtable Config] Base ID:', baseId);
-    console.log('[Airtable Config] Table Name:', TABLE);
-
     if (!apiKey || !baseId) {
-        throw new Error('Variables d\'environnement Airtable manquantes : AIRTABLE_API_KEY ou AIRTABLE_BASE_ID.');
+        throw new Error('Configuration manquante : AIRTABLE_API_KEY ou AIRTABLE_BASE_ID est vide.');
     }
+
+    // Validation basique des formats
+    if (!apiKey.startsWith('pat.')) {
+        console.warn('⚠️ AIRTABLE_API_KEY ne semble pas être un jeton (PAT) valide (devrait commencer par "pat.")');
+    }
+    if (!baseId.startsWith('app')) {
+        throw new Error(`AIRTABLE_BASE_ID invalide : "${baseId}". Un ID de base Airtable doit commencer par "app".`);
+    }
+
     return new Airtable({ apiKey }).base(baseId);
 }
 
