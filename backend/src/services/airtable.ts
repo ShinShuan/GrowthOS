@@ -37,7 +37,7 @@ export async function createLead(data: LeadData) {
 
     try {
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout)')), 4000)
+            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout 8s)')), 8000)
         );
 
         // Attempt 1: Full fields
