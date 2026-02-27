@@ -48,7 +48,7 @@ router.post('/', async (req: Request, res: Response) => {
         console.error('❌ Erreur critique lors de la création du lead:', error);
         return res.status(500).json({
             success: false,
-            message: error.message || 'Une erreur est survenue. Veuillez réessayer.',
+            message: error.message || 'Une erreur serveur est survenue.',
         });
     }
 });

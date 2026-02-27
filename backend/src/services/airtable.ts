@@ -8,8 +8,13 @@ const TABLE = process.env.AIRTABLE_TABLE_NAME || 'Nouvelle Table';
 function getBase() {
     const apiKey = process.env.AIRTABLE_API_KEY;
     const baseId = process.env.AIRTABLE_BASE_ID;
+
+    console.log('[Airtable Config] API Key exists:', !!apiKey);
+    console.log('[Airtable Config] Base ID:', baseId);
+    console.log('[Airtable Config] Table Name:', TABLE);
+
     if (!apiKey || !baseId) {
-        throw new Error('Missing Airtable env vars: AIRTABLE_API_KEY and AIRTABLE_BASE_ID are required.');
+        throw new Error('Variables d\'environnement Airtable manquantes : AIRTABLE_API_KEY ou AIRTABLE_BASE_ID.');
     }
     return new Airtable({ apiKey }).base(baseId);
 }
@@ -44,13 +49,21 @@ export async function createLead(data: LeadData) {
         const record = await Promise.race([recordPromise, timeoutPromise]) as Airtable.Records<Airtable.FieldSet>;
         return record[0];
     } catch (error: any) {
-        console.error('[Airtable Error]', error);
-        // Provide more context in the error message for debugging
-        if (error.error === 'NOT_FOUND') {
-            throw new Error(`Table "${TABLE}" non trouvée. Vérifiez AIRTABLE_TABLE_NAME dans Vercel.`);
+        console.error('[Airtable Error Details]', {
+            message: error.message,
+            statusCode: error.statusCode,
+            type: error.type,
+            error: error.error
+        });
+
+        if (error.statusCode === 404 || error.error === 'NOT_FOUND') {
+            throw new Error(`Ressource Airtable non trouvée. Vérifiez que la table "${TABLE}" et le Base ID sont corrects.`);
         }
-        if (error.error === 'INVALID_VALUE_FOR_COLUMN') {
-            throw new Error(`Colonnes Airtable incorrectes. Assurez-vous d'avoir "Name" et "Description".`);
+        if (error.statusCode === 401 || error.statusCode === 403) {
+            throw new Error(`Erreur d'authentification Airtable. Vérifiez votre API KEY.`);
+        }
+        if (error.error === 'INVALID_VALUE_FOR_COLUMN' || error.statusCode === 422) {
+            throw new Error(`Données invalides pour Airtable. Vérifiez que les colonnes "Name" et "Description" existent.`);
         }
         throw error;
     }
