@@ -100,12 +100,25 @@ export async function testAirtableConnection() {
         const fetchPromise = base(TABLE).select({ maxRecords: 1 }).firstPage();
 
         await Promise.race([fetchPromise, timeoutPromise]);
-        return { success: true, message: "Connexion à Airtable établie avec succès." };
+        return {
+            success: true,
+            message: "Connexion à Airtable établie avec succès.",
+            config: {
+                hasApiKey: !!process.env.AIRTABLE_API_KEY,
+                hasBaseId: !!process.env.AIRTABLE_BASE_ID,
+                tableName: TABLE
+            }
+        };
     } catch (error: any) {
         console.error('[Airtable Connectivity Test Failed]', error);
         return {
             success: false,
             message: `Échec de connexion : ${error.message}`,
+            config: {
+                hasApiKey: !!process.env.AIRTABLE_API_KEY,
+                hasBaseId: !!process.env.AIRTABLE_BASE_ID,
+                tableName: TABLE
+            },
             details: {
                 statusCode: error.statusCode,
                 type: error.type
