@@ -31,23 +31,39 @@ export async function createLead(data: LeadData) {
     console.log(`[Airtable] Attempting to create lead in table: ${TABLE}`);
 
     try {
-        // Add a timeout to Airtable creation to avoid hanging the function
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout)')), 6000)
+            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout)')), 9000)
         );
 
-        const recordPromise = base(TABLE).create([
+        // Attempt 1: Full fields
+        const createWithAllFields = () => base(TABLE).create([
             {
                 fields: {
-                    "Name": data.nom,
+                    "Name": data.nom || "Client",
                     "Description": `Email: ${data.email}\nTéléphone: ${data.telephone}\nAgence: ${data.agence}\nDate: ${new Date().toLocaleString()}`,
-                    "Status": "Draft" // Matching user's "Sélection unique (Draft, Active, Completed)"
+                    "Status": "Draft"
                 },
             },
         ]);
 
-        const record = await Promise.race([recordPromise, timeoutPromise]) as Airtable.Records<Airtable.FieldSet>;
-        return record[0];
+        try {
+            const records = await Promise.race([createWithAllFields(), timeoutPromise]) as any;
+            return records[0];
+        } catch (innerError: any) {
+            console.warn('[Airtable Attempt 1 Failed] Trying fallback with fewer fields...', innerError.message);
+
+            // Attempt 2: Minimal fields (just Name) - some users might not have Description or Status columns
+            const createMinimal = () => base(TABLE).create([
+                {
+                    fields: {
+                        "Name": `${data.nom} (${data.email})` || "Client",
+                    },
+                },
+            ]);
+
+            const records = await Promise.race([createMinimal(), timeoutPromise]) as any;
+            return records[0];
+        }
     } catch (error: any) {
         console.error('[Airtable Error Details]', {
             message: error.message,
@@ -57,15 +73,12 @@ export async function createLead(data: LeadData) {
         });
 
         if (error.statusCode === 404 || error.error === 'NOT_FOUND') {
-            throw new Error(`Ressource Airtable non trouvée. Vérifiez que la table "${TABLE}" et le Base ID sont corrects.`);
+            throw new Error(`Ressource Airtable non trouvée. Vérifiez que la table "${TABLE}" existe.`);
         }
         if (error.statusCode === 401 || error.statusCode === 403) {
-            throw new Error(`Erreur d'authentification Airtable. Vérifiez votre API KEY.`);
+            throw new Error(`Erreur d'authentification Airtable (401/403). Vérifiez votre API KEY.`);
         }
-        if (error.error === 'INVALID_VALUE_FOR_COLUMN' || error.statusCode === 422) {
-            throw new Error(`Données invalides pour Airtable. Vérifiez que les colonnes "Name" et "Description" existent.`);
-        }
-        throw error;
+        throw new Error(`Airtable Error: ${error.message || 'Erreur inconnue'}`);
     }
 }
 
@@ -76,3 +89,23 @@ export async function updateLeadStatus(recordId: string, statut: string) {
     });
     return record;
 }
+
+export async function testAirtableConnection() {
+    try {
+        const base = getBase();
+        // Try to fetch just one record to verify connectivity
+        await base(TABLE).select({ maxRecords: 1 }).firstPage();
+        return { success: true, message: "Connexion à Airtable établie avec succès." };
+    } catch (error: any) {
+        console.error('[Airtable Connectivity Test Failed]', error);
+        return {
+            success: false,
+            message: `Échec de connexion : ${error.message}`,
+            details: {
+                statusCode: error.statusCode,
+                type: error.type
+            }
+        };
+    }
+}
+

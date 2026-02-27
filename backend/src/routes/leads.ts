@@ -1,9 +1,19 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import { createLead } from '../services/airtable';
+import { createLead, testAirtableConnection } from '../services/airtable';
 import { sendPdfEmail } from '../services/email';
 
 const router = Router();
+
+// Test Airtable connectivity
+router.get('/test', async (_req: Request, res: Response) => {
+    try {
+        const result = await testAirtableConnection();
+        return res.status(result.success ? 200 : 500).json(result);
+    } catch (error: any) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 const leadSchema = z.object({
     nom: z.string().min(2, 'Nom trop court'),
