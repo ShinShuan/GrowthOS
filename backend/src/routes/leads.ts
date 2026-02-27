@@ -40,14 +40,12 @@ router.post('/', async (req: Request, res: Response) => {
         const airtableRecord = await createLead({ nom, email, telephone, agence: agence || '' });
         console.log(`✅ Lead créé dans Airtable: ${airtableRecord.id}`);
 
-        // 2. Send PDF by email (wrapped in try/catch to avoid crashing if SMTP is not set)
-        try {
-            await sendPdfEmail({ nom, email });
-            console.log(`📧 Email envoyé à: ${email}`);
-        } catch (emailError) {
-            console.error('⚠️ Erreur lors de l\'envoi de l\'email (SMTP non configuré ou PDF manquant):', emailError);
-            // On continue quand même ici car le lead est créé
-        }
+        // 2. Send PDF by email (Non-blocking)
+        sendPdfEmail({ nom, email })
+            .then(() => console.log(`📧 Email envoyé à: ${email}`))
+            .catch(emailError => {
+                console.error('⚠️ Erreur lors de l\'envoi de l\'email (SMTP non configuré ou PDF manquant):', emailError);
+            });
 
         return res.status(200).json({
             success: true,

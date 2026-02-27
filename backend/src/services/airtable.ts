@@ -32,7 +32,7 @@ export async function createLead(data: LeadData) {
 
     try {
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout)')), 9000)
+            setTimeout(() => reject(new Error('Airtable a mis trop de temps à répondre (Timeout)')), 4000)
         );
 
         // Attempt 1: Full fields
@@ -93,8 +93,13 @@ export async function updateLeadStatus(recordId: string, statut: string) {
 export async function testAirtableConnection() {
     try {
         const base = getBase();
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout de connexion à Airtable (5s)')), 5000)
+        );
         // Try to fetch just one record to verify connectivity
-        await base(TABLE).select({ maxRecords: 1 }).firstPage();
+        const fetchPromise = base(TABLE).select({ maxRecords: 1 }).firstPage();
+
+        await Promise.race([fetchPromise, timeoutPromise]);
         return { success: true, message: "Connexion à Airtable établie avec succès." };
     } catch (error: any) {
         console.error('[Airtable Connectivity Test Failed]', error);
