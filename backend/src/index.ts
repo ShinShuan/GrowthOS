@@ -26,8 +26,11 @@ app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 GrowthOS Backend running on http://localhost:${PORT}`);
-});
+// Export the app for Vercel Serverless
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`🚀 GrowthOS Backend running on http://localhost:${PORT}`);
+    });
+}
 
 export default app;
