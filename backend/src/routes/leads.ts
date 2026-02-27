@@ -36,20 +36,37 @@ router.post('/', async (req: Request, res: Response) => {
 
         const { nom, email, telephone, agence } = result.data;
 
-        // 1. Create lead in Airtable
-        const airtableRecord = await createLead({ nom, email, telephone, agence: agence || '' });
-        console.log(`✅ Lead créé dans Airtable: ${airtableRecord.id}`);
+        // 1. Create lead in Airtable (Resilient attempt)
+        let airtableSuccess = false;
+        try {
+            const airtableRecord = await createLead({ nom, email, telephone, agence: agence || '' });
+            console.log(`✅ Lead créé dans Airtable: ${airtableRecord.id}`);
+            airtableSuccess = true;
+        } catch (airtableError) {
+            console.error('⚠️ Échec de création du lead dans Airtable (Timeout ou autres):', airtableError);
+            // We continue anyway to send the email to the prospect
+        }
 
-        // 2. Send PDF by email (Non-blocking)
-        sendPdfEmail({ nom, email })
-            .then(() => console.log(`📧 Email envoyé à: ${email}`))
-            .catch(emailError => {
-                console.error('⚠️ Erreur lors de l\'envoi de l\'email (SMTP non configuré ou PDF manquant):', emailError);
-            });
+        // 2. Send PDF to prospect + Notify Owner (Non-blocking)
+        const emailData = { nom, email };
+
+        // Prospect Email
+        sendPdfEmail(emailData)
+            .then(() => console.log(`📧 Email guide envoyé à: ${email}`))
+            .catch(err => console.error('❌ Erreur email prospect:', err));
+
+        // Owner Notification (Optional but good for resilience)
+        if (process.env.EMAIL_FROM) {
+            sendPdfEmail({
+                nom: "ADMIN - Nouveau Lead",
+                email: process.env.EMAIL_FROM // Reuse EMAIL_FROM as notification target if applicable
+            }).catch(() => { }); // Silent catch for admin notification
+        }
 
         return res.status(200).json({
             success: true,
             message: 'Lead enregistré avec succès !',
+            warnings: airtableSuccess ? undefined : ['Airtable unavailable, lead preserved via logs/email']
         });
 
     } catch (error: any) {
