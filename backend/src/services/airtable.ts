@@ -99,7 +99,7 @@ export async function testAirtableConnection() {
     try {
         const base = getBase();
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout de connexion à Airtable (5s)')), 5000)
+            setTimeout(() => reject(new Error('Timeout de connexion à Airtable (8s)')), 8000)
         );
         // Try to fetch just one record to verify connectivity
         const fetchPromise = base(TABLE).select({ maxRecords: 1 }).firstPage();
