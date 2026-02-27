@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const PDF_PATH = path.join(__dirname, '../../../pdf/output/Guide_10_RDV_automatiques.pdf');
+const PDF_PATH = path.join(__dirname, '../../../pdf/output/GrowthOS_Guide_Strategique.pdf');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.zoho.com',
@@ -27,7 +27,7 @@ export async function sendPdfEmail({ nom, email }: { nom: string; email: string 
   const hasPdf = fs.existsSync(PDF_PATH);
 
   const attachments = hasPdf
-    ? [{ filename: 'Guide_10_RDV_automatiques.pdf', path: PDF_PATH }]
+    ? [{ filename: 'GrowthOS_Guide_Strategique.pdf', path: PDF_PATH }]
     : [];
 
   await transporter.sendMail({
@@ -63,28 +63,27 @@ export async function sendPdfEmail({ nom, email }: { nom: string; email: string 
             <p style="color:#ccc; margin:0;">Vous avez fait le premier pas vers l'automatisation de votre prospection.</p>
           </div>
           
-          <p>Vous trouverez en pièce jointe votre guide :</p>
-          <p style="font-weight:700; font-size:18px;">📄 <span class="highlight">Guide 10 RDV automatiques en 3 semaines</span></p>
+          <p>Vous trouverez en pièce jointe votre guide stratégiqe :</p>
+          <p style="font-weight:700; font-size:18px;">📄 <span class="highlight">L'Infrastructure de Vente Autonome</span></p>
           
           <p>Ce que vous allez découvrir :</p>
           
-          <div class="step"><div class="step-num">1</div><div>Comment identifier vos <strong>247 contacts dormants</strong> qui représentent des revenus cachés</div></div>
-          <div class="step"><div class="step-num">2</div><div>La méthode exacte pour les <strong>réactiver automatiquement</strong> avec l'IA</div></div>
-          <div class="step"><div class="step-num">3</div><div>Les <strong>3 outils</strong> que les meilleures agences utilisent en secret</div></div>
-          <div class="step"><div class="step-num">4</div><div>Les études de cas <strong>Lyon, Paris, Toulouse</strong> avec ROI calculé</div></div>
+          <div class="step"><div class="step-num">1</div><div><strong>L'Hémorragie Silencieuse</strong> : Pourquoi votre CRM actuel vous fait perdre des milliers d'euros</div></div>
+          <div class="step"><div class="step-num">2</div><div><strong>L'Écosystème d'Agents</strong> : Présentation de votre nouvelle équipe autonome (Scanner, Marc, Booking)</div></div>
+          <div class="step"><div class="step-num">3</div><div><strong>Synergie & Flux</strong> : Comment l'information circule pour maximiser vos mandats</div></div>
+          <div class="step"><div class="step-num">4</div><div><strong>Cas d'Usage Réels</strong> : Résultats concrets et ROI mesuré pour des agences comme la vôtre</div></div>
           
           <div class="stat">
-            💡 <strong>Stat clé :</strong> Nos clients génèrent en moyenne <span class="highlight">10-15 RDV qualifiés</span> dès la 3ème semaine.
+            💡 <strong>Rappel :</strong> Votre infrastructure GrowthOS ne dort jamais. Elle travaille pendant que vous prospectez ou négociez.
           </div>
           
           <div class="ps">
-            <strong>PS :</strong> Vous avez 247 contacts dormants dans votre téléphone ?<br/>
-            Je peux vous montrer en <strong>10 min exactement</strong> combien ils vous font perdre chaque mois.<br/><br/>
+            <strong>PS :</strong> Je peux vous montrer en <strong>10 min exactement</strong> comment activer cette infrastructure sur vos propres contacts.<br/><br/>
             Répondez simplement <strong>"OUI"</strong> à cet email et je vous appelle demain matin.<br/><br/>
             À très vite,<br/>
             <strong>Marc</strong><br/>
-            <span style="color:#00D4FF">Fondateur SalesHunter</span><br/>
-            <span style="color:#666; font-size:12px;">+33 X XX XX XX XX</span>
+            <span style="color:#00D4FF">GrowthOS Infrastructure</span><br/>
+            <span style="color:#666; font-size:12px;">Écosystème de Vente Autonome</span>
           </div>
         </div>
       </body>
