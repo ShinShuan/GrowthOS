@@ -13,7 +13,18 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
 // Middleware
 app.use((0, cors_1.default)({
-    origin: [process.env.FRONTEND_URL || 'http://localhost:19006', 'http://localhost:3000'],
+    origin: (origin, callback) => {
+        // Allow requests from any Vercel domain, localhost, or no-origin (server-to-server)
+        if (!origin ||
+            origin.includes('localhost') ||
+            origin.includes('vercel.app') ||
+            origin === process.env.FRONTEND_URL) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error('CORS not allowed for origin: ' + origin));
+        }
+    },
     credentials: true,
 }));
 app.use(express_1.default.json());
