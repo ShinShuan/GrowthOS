@@ -30,20 +30,25 @@ router.post('/', async (req: Request, res: Response) => {
         const airtableRecord = await createLead({ nom, email, telephone, agence: agence || '' });
         console.log(`✅ Lead créé dans Airtable: ${airtableRecord.id}`);
 
-        // 2. Send PDF by email
-        await sendPdfEmail({ nom, email });
-        console.log(`📧 Email envoyé à: ${email}`);
+        // 2. Send PDF by email (wrapped in try/catch to avoid crashing if SMTP is not set)
+        try {
+            await sendPdfEmail({ nom, email });
+            console.log(`📧 Email envoyé à: ${email}`);
+        } catch (emailError) {
+            console.error('⚠️ Erreur lors de l\'envoi de l\'email (SMTP non configuré ou PDF manquant):', emailError);
+            // On continue quand même ici car le lead est créé
+        }
 
         return res.status(200).json({
             success: true,
-            message: 'Lead enregistré. Vérifiez votre email pour le guide gratuit!',
+            message: 'Lead enregistré avec succès !',
         });
 
-    } catch (error) {
-        console.error('❌ Erreur lors de la création du lead:', error);
+    } catch (error: any) {
+        console.error('❌ Erreur critique lors de la création du lead:', error);
         return res.status(500).json({
             success: false,
-            message: 'Une erreur est survenue. Veuillez réessayer.',
+            message: error.message || 'Une erreur est survenue. Veuillez réessayer.',
         });
     }
 });
