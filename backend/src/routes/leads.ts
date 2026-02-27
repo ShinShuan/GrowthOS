@@ -28,16 +28,21 @@ router.get('/debug-config', async (_req: Request, res: Response) => {
         return res.status(200).json({
             success: true,
             config: {
-                AIRTABLE_TABLE_NAME: tableName,
+                ACTIVE_TABLE_NAME: tableName,
                 AIRTABLE_BASE_ID_MASK: baseId ? `${baseId.substring(0, 3)}...${baseId.substring(baseId.length - 3)}` : 'MISSING',
                 AIRTABLE_API_KEY_START: apiKey ? `${apiKey.substring(0, 4)}...` : 'MISSING',
-                AIRTABLE_API_KEY_FORMAT: apiKey ? (apiKey.startsWith('pat.') ? 'VALID (pat.)' : 'INVALID (No pat.)') : 'MISSING',
-                TIPS: "Verified from code: If START is NOT 'pat.', you are updating the wrong Vercel project."
+                AIRTABLE_API_KEY_FORMAT: apiKey ? (apiKey.startsWith('pat') ? 'VALID (pat)' : 'INVALID (No pat)') : 'MISSING',
+                TIPS: "Verified from code: If START is NOT 'pat', you are updating the wrong Vercel project."
             },
             connectivity: {
                 status: connectionStatus,
                 error: airtableError
-            }
+            },
+            diagnosis: [
+                `1. Clé API détectée: ${apiKey ? apiKey.substring(0, 4) : 'VIDE'}. Si ce n'est pas 'pat', changez-la dans Vercel.`,
+                `2. Base ID détecté: ${baseId ? baseId.substring(0, 6) : 'VIDE'}. Vérifiez qu'il commence par 'app'.`,
+                `3. Table détectée: "${tableName}". L'onglet Airtable doit s'appeler EXACTEMENT comme ça.`
+            ]
         });
     } catch (error: any) {
         return res.status(500).json({ success: false, message: error.message });
