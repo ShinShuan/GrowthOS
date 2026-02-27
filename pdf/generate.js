@@ -45,10 +45,10 @@ function accent(text, x, y, size = 12, color = C.white) {
 function divider(y, color = C.zincDark) {
     doc.moveTo(50, y).lineTo(W - 50, y).strokeColor(color).lineWidth(1).stroke();
 }
-function card(x, y, w, h, color = C.zincDark, opacity = 0.5) {
-    doc.roundedRect(x, y, w, h, 12).fillColor(color).fillOpacity(opacity).fill();
+function card(x, y, w, h, color = C.zincDark, opacity = 0.5, radius = 24) {
+    doc.roundedRect(x, y, w, h, radius).fillColor(color).fillOpacity(opacity).fill();
     doc.fillOpacity(1);
-    doc.roundedRect(x, y, w, h, 12).strokeColor(C.zincDark).lineWidth(0.5).stroke();
+    doc.roundedRect(x, y, w, h, radius).strokeColor(C.zincDark).lineWidth(0.5).stroke();
 }
 
 // ─────────────────────────────────────────────────────────
@@ -111,17 +111,19 @@ heading('L\'Écosystème Autonome', 50, 100, 32);
 divider(150);
 
 const agents = [
-    { name: 'LE SCANNER (IA)', role: 'Extraction & Intelligence', desc: 'Analyse massive de vos bases de données et des plateformes immobilières. Il identifie les signaux faibles de vente avant vos concurrents.' },
+    { name: 'LE SCANNER', role: 'Extraction & Intelligence', desc: 'Analyse massive de vos bases de données et des plateformes immobilières. Il identifie les signaux faibles de vente avant vos concurrents.' },
     { name: 'MARC (AGENT VOCAL)', role: 'Qualification Humaine-Grade', desc: 'Notre IA vocale appelle vos prospects. Elle ne se contente pas de parler : elle écoute, répond aux objections et qualifie l\'intérêt réel.' },
+    { name: 'RÉDACTEUR SEO', role: 'Autorité & Trafic', desc: 'Génère des articles ultra-optimisés et des posts sociaux pour positionner votre agence comme la référence locale absolue sur Google.' },
+    { name: 'AGENT DATA MINER', role: 'Enrichissement de Leads', desc: 'Traverse le web pour enrichir chaque prospect avec son profil LinkedIn, ses récents achats immobiliers et ses intérêts actuels.' },
     { name: 'BOOKING AGENT', role: 'Conversion & Logistique', desc: 'Une fois le lead chaud identifié, il synchronise les agendas et réserve le rendez-vous. Vous ne recevez que le résultat final.' }
 ];
 
 agents.forEach((a, i) => {
-    const y = 180 + i * 160;
-    card(50, y, W - 100, 140, C.zincDark);
-    doc.font('Helvetica-Bold').fontSize(16).fillColor(C.white).text(a.name, 75, y + 25);
-    doc.font('Helvetica-Bold').fontSize(10).fillColor(C.zinc).text(a.role.toUpperCase(), 75, y + 48);
-    body(a.desc, 75, y + 70, 11, C.zincLight, { width: W - 180 });
+    const y = 175 + i * 115;
+    card(50, y, W - 100, 100, C.zincDark, 0.5, 20);
+    doc.font('Helvetica-Bold').fontSize(14).fillColor(C.white).text(a.name, 75, y + 20);
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(C.zinc).text(a.role.toUpperCase(), 75, y + 38);
+    body(a.desc, 75, y + 55, 10, C.zincLight, { width: W - 180, lineGap: 2 });
 
     // Tiny "Active" badge
     doc.circle(W - 100, y + 35, 4).fill(C.white);
@@ -154,7 +156,7 @@ flow.forEach((f, i) => {
     doc.font('Helvetica-Bold').fontSize(12).fillColor(C.white).text(f, 100, y - 5);
 });
 
-doc.rect(50, 600, W - 100, 120).fill(C.white);
+card(50, 600, W - 100, 120, C.white, 1, 30);
 doc.font('Helvetica-Bold').fontSize(14).fillColor(C.black).text('RÉSULTAT NET', 75, 625);
 doc.font('Helvetica').fontSize(12).fillColor(C.black).text('Vous passez de 500 numéros inconnus à 12 opportunités de mandats prêtes à être signées. Sans avoir passé un seul appel.', 75, 650, { width: W - 150 });
 
@@ -175,7 +177,7 @@ body('• Durée : 14 jours\n• Contacts traités : 812\n• Taux de réponse I
 heading('+84 000€', 70, 360, 36, C.white);
 doc.font('Helvetica-Bold').fontSize(10).fillColor(C.zinc).text('CHIFFRE D\'AFFAIRES POTENTIEL DÉRIVÉ', 270, 375);
 
-body('Observation : "Nous pensions que ces leads étaient morts. En réalité, ils attendaient juste que quelqu\'un les appelle au bon moment."', 50, 480, 12, C.white, { oblique: true });
+body('Observation : "Nous pensons que ces leads étaient morts. En réalité, ils attendaient juste que quelqu\'un les appelle au bon moment."', 50, 480, 12, C.white, { oblique: true });
 
 // ─────────────────────────────────────────────────────────
 // PAGE 6 — CAS D'USAGE : PIGE AUTO
@@ -242,11 +244,11 @@ heading('L\'AUTONOMIE ?', 50, 310, 64, C.white);
 
 body('L\'infrastructure de demain ne dort pas. La vôtre non plus.', 50, 420, 14, C.white);
 
-doc.rect(50, 480, W - 100, 80).fill(C.white);
-doc.font('Helvetica-Bold').fontSize(18).fillColor(C.black).text('RÉSERVER MON AUDIT IA', 50, 510, { align: 'center', width: W - 100 });
+card(50, 480, W - 100, 80, C.white, 1, 40);
+doc.font('Helvetica-Bold').fontSize(18).fillColor(C.black).text('RÉSERVER MON AUDIT', 50, 510, { align: 'center', width: W - 100 });
 
 body('Envoyez "OUI" en réponse à l\'email reçu ou contactez-nous :', 50, 600, 11, C.zinc, { align: 'center' });
-doc.font('Helvetica-Bold').fontSize(12).fillColor(C.white).text('contact@growthos.fr', 50, 630, { align: 'center', width: W - 100 });
+doc.font('Helvetica').fontSize(12).fillColor(C.white).text('setup@growthos.fr', 50, 630, { align: 'center', width: W - 100 });
 
 doc.end();
-console.log(`✅ PDF "GrowthOS_Guide_Strategique.pdf" généré avec succès.`);
+console.log(`✅ PDF généré avec succès à : ${outPath}`);

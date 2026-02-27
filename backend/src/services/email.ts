@@ -82,7 +82,7 @@ export async function sendPdfEmail({ nom, email }: { nom: string; email: string 
             Répondez simplement <strong>"OUI"</strong> à cet email et je vous appelle demain matin.<br/><br/>
             À très vite,<br/>
             <strong>Marc</strong><br/>
-            <span style="color:#00D4FF">GrowthOS Infrastructure</span><br/>
+            <span style="color:#00D4FF">setup@growthos.fr</span><br/>
             <span style="color:#666; font-size:12px;">Écosystème de Vente Autonome</span>
           </div>
         </div>
