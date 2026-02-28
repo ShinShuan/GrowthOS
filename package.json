@@ -4,13 +4,11 @@
   "private": true,
   "workspaces": [
     "frontend",
-    "backend",
     "pdf"
   ],
   "scripts": {
     "dev:frontend": "cd frontend && npm start",
-    "dev:backend": "cd backend && npm run dev",
-    "dev": "npm run dev:backend & npm run dev:frontend",
+    "dev": "npm run dev:frontend",
     "generate:pdf": "cd pdf && node generate.js"
   }
 }
